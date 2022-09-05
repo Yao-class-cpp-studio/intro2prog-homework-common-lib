@@ -7,3 +7,5 @@ list(APPEND COMMON_LIBS common_opengl_lib)
 set(COMMON_LIBS ${COMMON_LIBS} PARENT_SCOPE)
 
 target_include_directories(common_opengl_lib PUBLIC ${INCLUDE_DIRS})
+
+target_link_libraries(common_opengl_lib PUBLIC glad glfw freetype)
