@@ -30,7 +30,7 @@ VertexArray::VertexArray(Buffer *vertex_buffer,
   }
   OpenGLCall(glBindBuffer, GL_ARRAY_BUFFER, vertex_buffer->GetHandle());
   OpenGLCall(glBindBuffer, GL_ELEMENT_ARRAY_BUFFER, index_buffer->GetHandle());
-  int offset = 0;
+  uint64_t offset = 0;
   for (size_t i = 0; i < attribs.size(); i++) {
     auto attrib = attribs[i];
     switch (attrib) {
