@@ -1,10 +1,6 @@
 
 file(GLOB source_files **/*.cpp **/*.h *.cpp *.h)
 
-foreach(source_file ${source_files})
-    message("${source_file}")
-endforeach()
-
 add_library(common_geometry_lib STATIC ${source_files})
 
 target_include_directories(common_geometry_lib PUBLIC ${INCLUDE_DIRS})
