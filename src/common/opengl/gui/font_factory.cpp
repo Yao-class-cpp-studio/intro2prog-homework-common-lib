@@ -341,4 +341,12 @@ const FontFactory::TypeFace &FontFactory::LoadCharMesh(char32_t c) {
   return char_mesh_.at(c);
 }
 
+float FontFactory::GetStringAdvance(const std::u32string &str) {
+  float advance = 0.0f;
+  for (auto c : str) {
+    advance += LoadCharMesh(c).advance;
+  }
+  return advance;
+}
+
 }  // namespace opengl::gui

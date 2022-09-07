@@ -4,25 +4,6 @@
 
 namespace opengl::gui {
 
-#ifdef COMPARE
-#undef COMPARE
-#endif
-namespace {
-struct MyCmp {
-  bool operator()(const glm::vec2 &v0, const glm::vec2 &v1) const {
-#define COMPARE(x) \
-  if (v0.x < v1.x) \
-    return true;   \
-  if (v1.x < v0.x) \
-    return false;
-    COMPARE(x);
-    COMPARE(y);
-#undef COMPARE
-    return false;
-  }
-};
-}  // namespace
-
 TextBar::TextBar(App *app,
                  FontFactory *font_factory,
                  const std::u32string &text,
@@ -90,26 +71,8 @@ void TextBar::BuildMesh() {
       }
       break;
   }
-  std::map<glm::vec2, int, MyCmp> vertex_index;
-  std::vector<ColorVertex> vertices;
-  std::vector<uint32_t> indices;
 
-  auto font_color = font_color_;
-
-  auto find_vertex_index = [&vertex_index, &vertices,
-                            font_color](const glm::vec2 &v) {
-    if (!vertex_index.count(v)) {
-      vertex_index[v] = int(vertices.size());
-      vertices.push_back({{v, 1.0}, font_color});
-    }
-    return vertex_index.at(v);
-  };
-
-  for (auto &triangle : triangles) {
-    indices.push_back(find_vertex_index(triangle));
-  }
-
-  model_ = std::make_unique<Model>(vertices, indices);
+  model_ = std::make_unique<Model>(triangles, font_color_);
   device_model_->Update(model_.get());
   auto local_to_world = LocalToWorld();
   OpenGLCall(glProgramUniformMatrix3fv, program_->GetHandle(),

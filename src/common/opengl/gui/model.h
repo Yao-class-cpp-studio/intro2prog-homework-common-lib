@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include "common/geometry/plane/mesh.h"
 #include "glm/glm.hpp"
 
 namespace opengl::gui {
@@ -21,6 +22,8 @@ class Model {
 
   Model(const std::vector<ColorVertex> &vertices,
         const std::vector<uint32_t> &indices);
+
+  Model(const std::vector<glm::vec2> &mesh, const glm::vec3 &color);
 
   std::vector<ColorVertex> &GetVertices();
 

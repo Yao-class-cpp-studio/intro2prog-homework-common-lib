@@ -24,6 +24,7 @@ class FontFactory {
   std::vector<glm::vec2> GetStringMesh(const std::u32string &str,
                                        float height,
                                        float *advance);
+  float GetStringAdvance(const std::u32string &str);
 
  private:
   const TypeFace &LoadCharMesh(char32_t c);
