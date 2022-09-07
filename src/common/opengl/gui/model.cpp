@@ -64,6 +64,13 @@ Model::Model(const std::vector<glm::vec2> &mesh, const glm::vec3 &color) {
   }
 }
 
+const std::vector<ColorVertex> &Model::GetVertices() const {
+  return vertices_;
+}
+const std::vector<uint32_t> &Model::GetIndices() const {
+  return indices_;
+}
+
 std::vector<ColorVertex> ComposeVertices(
     const std::vector<glm::vec3> &positions,
     const glm::vec3 &color) {
@@ -73,5 +80,22 @@ std::vector<ColorVertex> ComposeVertices(
     vertices.push_back({position, color});
   }
   return vertices;
+}
+
+Model MergeModel(const Model &model0, const Model &model1)  {
+  std::vector<ColorVertex> vertices;
+  std::vector<uint32_t> indices;
+  for (auto &vertex : model0.GetVertices()) {
+    vertices.push_back(vertex);
+  }
+  for (auto &vertex : model1.GetVertices()) {
+    vertices.push_back(vertex);
+  }
+  for (auto index : model0.GetIndices()) {
+    indices.push_back(index);
+  }
+  for (auto index : model1.GetIndices()) {
+    indices.push_back(index + model0.GetVertices().size());
+  }
 }
 }  // namespace opengl::gui

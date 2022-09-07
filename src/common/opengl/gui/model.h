@@ -26,8 +26,10 @@ class Model {
   Model(const std::vector<glm::vec2> &mesh, const glm::vec3 &color);
 
   std::vector<ColorVertex> &GetVertices();
+  [[nodiscard]] const std::vector<ColorVertex> &GetVertices() const;
 
   std::vector<uint32_t> &GetIndices();
+  [[nodiscard]] const std::vector<uint32_t> &GetIndices() const;
 
  private:
   std::vector<ColorVertex> vertices_;
@@ -37,5 +39,7 @@ class Model {
 std::vector<ColorVertex> ComposeVertices(
     const std::vector<glm::vec3> &positions,
     const glm::vec3 &color);
+
+Model MergeModel(const Model &model0, const Model &model1);
 
 }  // namespace opengl::gui
