@@ -5,6 +5,8 @@
 #include "common/opengl/gui/interpolation.h"
 #include "common/opengl/util.h"
 
+#include FT_OUTLINE_H
+
 namespace opengl::gui {
 
 namespace {
@@ -105,67 +107,80 @@ const FontFactory::TypeFace &FontFactory::LoadCharMesh(char32_t c) {
     int start = 0;
 
     auto mesh = geometry::plane::Mesh{};
-    std::vector<std::vector<glm::vec2>> contours;
-    for (int i = 0; i < outline.n_contours;
-         start = outline.contours[i] + 1, i++) {
-      std::vector<glm::vec2> contour_vecs;
-      std::vector<char> contour_tags;
-      for (int j = start; j <= outline.contours[i]; j++) {
-        auto point = outline.points[j];
-        contour_vecs.emplace_back(float(point.x) / 64.0f,
-                                  float(point.y) / 64.0f);
-        contour_tags.push_back(outline.tags[j]);
+
+    struct Outlines {
+      std::vector<std::vector<glm::vec2>> outlines;
+      std::vector<glm::vec2> buffer;
+      glm::vec2 pos{0.0f};
+      int precision;
+    } outlines{};
+    outlines.precision = arc_precision_;
+
+    FT_Outline_Funcs interface {};
+
+    interface.move_to = [](const FT_Vector *to, void *user) -> int {
+      auto *outlines = static_cast<Outlines *>(user);
+      glm::vec2 vec_to{float(to->x) / 64.0f, float(to->y) / 64.0f};
+      if (!outlines->buffer.empty()) {
+        outlines->outlines.push_back(outlines->buffer);
+        outlines->buffer.clear();
       }
+      outlines->pos = vec_to;
+      return 0;
+    };
 
-      int first_on = 0;
-      while (!(contour_tags[first_on] & 1)) {
-        first_on++;
+    interface.line_to = [](const FT_Vector *to, void *user) -> int {
+      auto *outlines = static_cast<Outlines *>(user);
+      glm::vec2 vec_to{float(to->x) / 64.0f, float(to->y) / 64.0f};
+      outlines->buffer.push_back(vec_to);
+      outlines->pos = vec_to;
+      return 0;
+    };
+
+    interface.conic_to = [](const FT_Vector *control, const FT_Vector *to,
+                            void *user) -> int {
+      auto *outlines = static_cast<Outlines *>(user);
+      glm::vec2 vec_control{float(control->x) / 64.0f,
+                            float(control->y) / 64.0f};
+      glm::vec2 vec_to{float(to->x) / 64.0f, float(to->y) / 64.0f};
+      std::vector<glm::vec2> bezier_points{outlines->pos, vec_control, vec_to};
+      for (int i = 1; i < outlines->precision; i++) {
+        outlines->buffer.push_back(BezierInterpolate(
+            bezier_points, float(i) / float(outlines->precision)));
       }
-
-      if (first_on) {
-        auto size = contour_tags.size();
-        for (int j = 0; j < first_on; j++) {
-          contour_tags.push_back(contour_tags[j]);
-          contour_vecs.push_back(contour_vecs[j]);
-        }
-        for (int j = 0; j < size; j++) {
-          contour_tags[j] = contour_tags[j + first_on];
-          contour_vecs[j] = contour_vecs[j + first_on];
-        }
-        contour_tags.resize(size);
-        contour_vecs.resize(size);
+      outlines->buffer.push_back(bezier_points[2]);
+      outlines->pos = vec_to;
+      return 0;
+    };
+    interface.cubic_to = [](const FT_Vector *control1,
+                            const FT_Vector *control2, const FT_Vector *to,
+                            void *user) -> int {
+      auto *outlines = static_cast<Outlines *>(user);
+      LOG_INFO("cubic_to ({},{}) ({},{}) ({},{})", control1->x, control1->y,
+               control2->x, control2->y, to->x, to->y);
+      glm::vec2 vec_control1{float(control1->x) / 64.0f,
+                             float(control1->y) / 64.0f};
+      glm::vec2 vec_control2{float(control2->x) / 64.0f,
+                             float(control2->y) / 64.0f};
+      glm::vec2 vec_to{float(to->x) / 64.0f, float(to->y) / 64.0f};
+      std::vector<glm::vec2> bezier_points{outlines->pos, vec_control1,
+                                           vec_control2, vec_to};
+      for (int i = 1; i < outlines->precision; i++) {
+        outlines->buffer.push_back(BezierInterpolate(
+            bezier_points, float(i) / float(outlines->precision)));
       }
+      outlines->buffer.push_back(bezier_points[3]);
+      outlines->pos = vec_to;
+      return 0;
+    };
 
-      std::vector<glm::vec2> stacked_vecs{contour_vecs[0]};
-
-      std::vector<glm::vec2> outline_vecs;
-      for (int j = 1; j <= contour_vecs.size(); j++) {
-        int true_j = ((j == contour_vecs.size()) ? 0 : j);
-        auto vec = contour_vecs[true_j];
-        if (contour_tags[true_j] & 1) {
-          if (stacked_vecs.size() == 1) {
-            // vpos.push_back(glm::vec3{stacked_vecs[0], 1.0});
-            outline_vecs.push_back(vec);
-          } else {
-            stacked_vecs.push_back(vec);
-            int precision = arc_precision_;
-            auto last_v = stacked_vecs[0];
-            for (int k = 1; k <= precision; k++) {
-              // vpos.push_back(glm::vec3{last_v, 1.0});
-              last_v =
-                  BezierInterpolate(stacked_vecs, float(k) / float(precision));
-              outline_vecs.push_back(last_v);
-            }
-            stacked_vecs.resize(1);
-          }
-          stacked_vecs[0] = vec;
-        } else {
-          stacked_vecs.push_back(vec);
-        }
-      }
-
-      contours.push_back(std::move(outline_vecs));
+    FT_Outline_Decompose(&outline, &interface, &outlines);
+    if (!outlines.buffer.empty()) {
+      outlines.outlines.push_back(outlines.buffer);
+      outlines.buffer.clear();
     }
+
+    std::vector<std::vector<glm::vec2>> &contours = outlines.outlines;
 
     auto cross = [](const glm::vec2 &v0, const glm::vec2 &v1) {
       return v0.x * v1.y - v0.y * v1.x;
