@@ -34,6 +34,8 @@ class TextBar : public Listener {
 
   void Resize(float font_size, glm::vec2 origin);
 
+  FontFactory* GetFontFactory();
+
  private:
   void BuildMesh();
 

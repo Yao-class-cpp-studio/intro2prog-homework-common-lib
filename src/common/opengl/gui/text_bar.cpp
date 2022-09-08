@@ -94,4 +94,8 @@ void TextBar::Resize(float font_size, glm::vec2 origin) {
              false, (float *)&local_to_world);
 }
 
+FontFactory *TextBar::GetFontFactory() {
+  return font_factory_;
+}
+
 }  // namespace opengl::gui
