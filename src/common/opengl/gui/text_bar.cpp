@@ -21,6 +21,7 @@ TextBar::TextBar(App *app,
   device_model_ = std::make_unique<DeviceModel>(model_.get());
   program_ = std::make_unique<Program>("../assets/shaders/color_geom.vert",
                                        "../assets/shaders/color_geom.frag");
+  program_uniform_alpha_ = glGetUniformLocation(program_->GetHandle(), "alpha");
   app_->RegisterListener(this);
   UpdateText(text);
 }
@@ -96,6 +97,11 @@ void TextBar::Resize(float font_size, glm::vec2 origin) {
 
 FontFactory *TextBar::GetFontFactory() {
   return font_factory_;
+}
+
+void TextBar::SetAlpha(float alpha) {
+  OpenGLCall(glProgramUniform1f, program_->GetHandle(), program_uniform_alpha_,
+             alpha);
 }
 
 }  // namespace opengl::gui

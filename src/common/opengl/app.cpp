@@ -140,8 +140,6 @@ void App::RegisterListener(Listener *listener) {
 void App::UnregisterListener(Listener *listener) {
   if (listeners_.count(listener)) {
     listeners_.erase(listener);
-  } else {
-    LOG_ERROR("Unregister non-existed listener.");
   }
 }
 }  // namespace opengl

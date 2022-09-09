@@ -137,4 +137,12 @@ void Button::OnStateChange(int state) {
 void Button::OnWindowSize(int width, int height) {
   Listener::OnWindowSize(width, height);
 }
+
+void Button::Activate() {
+  app_->RegisterListener(this);
+}
+
+void Button::Deactivate() {
+  app_->UnregisterListener(this);
+}
 }  // namespace opengl::gui

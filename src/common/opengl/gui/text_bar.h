@@ -34,7 +34,9 @@ class TextBar : public Listener {
 
   void Resize(float font_size, glm::vec2 origin);
 
-  FontFactory* GetFontFactory();
+  void SetAlpha(float alpha);
+
+  FontFactory *GetFontFactory();
 
  private:
   void BuildMesh();
@@ -49,5 +51,6 @@ class TextBar : public Listener {
   std::unique_ptr<Model> model_;
   std::unique_ptr<DeviceModel> device_model_;
   std::u32string text_;
+  int program_uniform_alpha_{0};
 };
 }  // namespace opengl::gui

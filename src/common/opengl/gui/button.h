@@ -20,6 +20,9 @@ class Button : public Listener {
   virtual void OnClick();
   virtual void OnResize();
 
+  void Activate();
+  void Deactivate();
+
  protected:
   void SetState(int state);
   glm::mat3 local_to_world_{};
