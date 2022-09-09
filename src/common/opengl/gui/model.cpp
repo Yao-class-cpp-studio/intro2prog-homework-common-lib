@@ -81,21 +81,4 @@ std::vector<ColorVertex> ComposeVertices(
   }
   return vertices;
 }
-
-Model MergeModel(const Model &model0, const Model &model1)  {
-  std::vector<ColorVertex> vertices;
-  std::vector<uint32_t> indices;
-  for (auto &vertex : model0.GetVertices()) {
-    vertices.push_back(vertex);
-  }
-  for (auto &vertex : model1.GetVertices()) {
-    vertices.push_back(vertex);
-  }
-  for (auto index : model0.GetIndices()) {
-    indices.push_back(index);
-  }
-  for (auto index : model1.GetIndices()) {
-    indices.push_back(index + model0.GetVertices().size());
-  }
-}
 }  // namespace opengl::gui

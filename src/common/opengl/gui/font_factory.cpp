@@ -156,8 +156,6 @@ const FontFactory::TypeFace &FontFactory::LoadCharMesh(char32_t c) {
                             const FT_Vector *control2, const FT_Vector *to,
                             void *user) -> int {
       auto *outlines = static_cast<Outlines *>(user);
-      LOG_INFO("cubic_to ({},{}) ({},{}) ({},{})", control1->x, control1->y,
-               control2->x, control2->y, to->x, to->y);
       glm::vec2 vec_control1{float(control1->x) / 64.0f,
                              float(control1->y) / 64.0f};
       glm::vec2 vec_control2{float(control2->x) / 64.0f,

@@ -40,6 +40,4 @@ std::vector<ColorVertex> ComposeVertices(
     const std::vector<glm::vec3> &positions,
     const glm::vec3 &color);
 
-Model MergeModel(const Model &model0, const Model &model1);
-
 }  // namespace opengl::gui
