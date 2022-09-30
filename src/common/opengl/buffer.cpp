@@ -6,9 +6,11 @@ namespace opengl {
 
 Buffer::Buffer(size_t size, void *data) {
   buffer_ = 0;
-  OpenGLCall(glCreateBuffers, 1, &buffer_);
-  OpenGLCall(glNamedBufferData, buffer_, static_cast<GLsizeiptr>(size), data,
+  OpenGLCall(glGenBuffers, 1, &buffer_);
+  OpenGLCall(glBindBuffer, GL_ARRAY_BUFFER, buffer_);
+  OpenGLCall(glBufferData, GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(size), data,
              GL_DYNAMIC_DRAW);
+  OpenGLCall(glBindBuffer, GL_ARRAY_BUFFER, 0);
 }
 
 size_t Buffer::GetSize() const {

@@ -5,7 +5,7 @@ namespace opengl {
 VertexArray::VertexArray(Buffer *vertex_buffer,
                          const std::vector<uint32_t> &attribs,
                          Buffer *index_buffer) {
-  OpenGLCall(glCreateVertexArrays, 1, &vertex_array_);
+  OpenGLCall(glGenVertexArrays, 1, &vertex_array_);
   OpenGLCall(glBindVertexArray, vertex_array_);
 
   int stride = 0;
