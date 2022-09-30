@@ -4,6 +4,7 @@ project(homework-common)
 
 set(CMAKE_CXX_STANDARD 17)
 
+set(FT_DISABLE_HARFBUZZ ON CACHE INTERNAL "" FORCE)
 add_subdirectory(third_party)
 add_subdirectory(src)
 
