@@ -1,12 +1,12 @@
 [submodule "third_party/freetype"]
 	path = third_party/freetype
-	url = git@github.com:freetype/freetype.git
+	url = https/github.com/freetype/freetype.git
 [submodule "third_party/glfw"]
 	path = third_party/glfw
-	url = git@github.com:glfw/glfw.git
+	url = https/github.com/glfw/glfw.git
 [submodule "third_party/spdlog"]
 	path = third_party/spdlog
-	url = git@github.com:gabime/spdlog.git
+	url = https/github.com/gabime/spdlog.git
 [submodule "third_party/glm"]
 	path = third_party/glm
-	url = git@github.com:g-truc/glm.git
+	url = https/github.com/g-truc/glm.git
